@@ -77,7 +77,10 @@ def generate_terraform_and_imports(csv_file, json_file, output_file, output_scri
     """Generates Terraform blocks and import commands based on CSV and JSON data."""
     df = pd.read_csv(csv_file)
     with open(json_file, 'r') as file:
-        json_rules = json.load(file)
+        json_data = json.load(file)
+
+    # Access the "SecurityGroupRules" array
+    json_rules = json_data.get("SecurityGroupRules", [])
 
     terraform_blocks = []
     ingress_counters = {}
@@ -167,10 +170,10 @@ resource "{resource_type}" "{rule_name}" {{
     print(f"Terraform blocks generated: {len(terraform_blocks)}")
     print(f"Terraform import commands generated: {len(rule_id_counts)}")
 
-# Example usage
+
+# Fill with your file names
 csv_file = "security_rules.csv"
 json_file = "security_group_rules.json"
 output_file = "terraform_security_rules.txt"
 output_script_file = "terraform_import_script.bat"
 generate_terraform_and_imports(csv_file, json_file, output_file, output_script_file)
-
