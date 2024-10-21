@@ -142,15 +142,21 @@ resource "{resource_type}" "{rule_name}" {{
   security_group_id = "{terraform_block['rule_id']}"
   ip_protocol = "{terraform_block['ip_protocol']}"
 """
-            if from_port is not None:
+            # Only include from_port and to_port if they are not -1
+            if from_port is not None and from_port != -1:
                 terraform_txt += f'  from_port = {from_port}\n'
-            if to_port is not None:
+            if to_port is not None and to_port != -1:
                 terraform_txt += f'  to_port = {to_port}\n'
+
+            # Add CIDR, referenced security group ID, or prefix list if present
             for key in ["cidr_ipv4", "referenced_security_group_id", "prefix_list_id"]:
                 if key in terraform_block:
                     terraform_txt += f'  {key} = "{terraform_block[key]}"\n'
+                    
+            # Add description if present
             if terraform_block["description"]:
                 terraform_txt += f'  description = "{terraform_block["description"]}"\n'
+
             terraform_txt += "}\n"
             terraform_blocks.append(terraform_txt)
 
